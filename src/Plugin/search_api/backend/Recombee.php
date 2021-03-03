@@ -270,6 +270,9 @@ class Recombee extends BackendPluginBase implements PluginFormInterface {
 
     // Compose item ID using the site ID, entity type and ID.
     $item_id = recombee_item_id($entity, $site_id);
+    if (\Drupal::languageManager()->isMultilingual()) {
+      $item_id = $item_id.'-'.$entity->language()->getId();
+    }
 
     $item_values = [
       'site' => $site_id,
