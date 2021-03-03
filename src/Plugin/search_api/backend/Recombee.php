@@ -16,6 +16,7 @@ use Drupal\search_api\SearchApiException;
 use Recombee\RecommApi\Client;
 use Recombee\RecommApi\Exceptions\ApiException;
 use Recombee\RecommApi\Requests\AddItemProperty;
+use Recombee\RecommApi\Requests\DeleteItem;
 use Recombee\RecommApi\Requests\DeleteItemProperty;
 use Recombee\RecommApi\Requests\ListItemProperties;
 use Recombee\RecommApi\Requests\Request;
@@ -314,7 +315,29 @@ class Recombee extends BackendPluginBase implements PluginFormInterface {
    * {@inheritdoc}
    */
   public function deleteItems(IndexInterface $index, array $item_ids) {
-    // TODO.
+    // We receive something like this 'entity:node/31:en',
+    // and we want to send something like this 'sitename-node-31-en'.
+    foreach ($item_ids as $item_id) {
+      $item_id_array = explode('/', str_replace(':', '/', $item_id));
+      $entity_type = $item_id_array[1];
+      $entity_id = $item_id_array[2];
+      $entity_langcode = $item_id_array[3];
+      $site_id = \Drupal::config('recombee.settings')->get('site_id');
+
+      $recombee_item_id = implode('-', array_filter([
+        $site_id,
+        $entity_type,
+        $entity_id,
+        $entity_langcode,
+      ]));
+
+      try {
+        $this->send(new DeleteItem($recombee_item_id));
+      } catch (\Exception $e) {
+        $this->getLogger()->warning($e->getMessage());
+        return;
+      }
+    }
   }
 
   /**
