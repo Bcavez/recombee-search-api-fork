@@ -11,6 +11,6 @@
   "require": {
     "drupal/search_api": "^1.0",
     "drupal/recombee": "^1.0",
-    "recombee/php-api-client": "^2.4.0"
+    "recombee/php-api-client": "^3.2.0"
   }
 }
